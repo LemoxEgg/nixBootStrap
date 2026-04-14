@@ -3,9 +3,11 @@
 
   ####configuration de base####
 
-  # on active systemd-boot (on pourrai aussi utiliser grub)
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.grub = {
+    enable = true;
+    device = "/dev/sda";
+    useOSProber = true;
+  };
 
   # le nom d'hôte
   networking.hostName = "nixos";
@@ -35,7 +37,7 @@
       extraGroups = [
         "wheel"
       ];
-      
+
       isNormalUser = true;
       description = "utilisateur prinicipal pour le projet de veille";
       # d'autre options sont possible bien sûr. mais elle ne sont pas
@@ -51,9 +53,6 @@
         # veut installer pour notre utilisateur. il est le
         # seul qui aura accès à ces programmes.
         # par exemple:
-        helix # un éditeur de texte que j'aime beaucoup
-        fastfetch # un classique
-        yazi # un explorateur de fichier dans le terminal
       ];
     };
   };
@@ -62,9 +61,22 @@
   # utilisateurs, incluant root
   environment.systemPackages = with pkgs; [
     git
+    ripgrep
+    dua
+    helix # un éditeur de texte que j'aime beaucoup
+    fastfetch # un classique
+    yazi # un explorateur de fichier dans le terminal
+    nixfmt
+    nil
+    nixd
+    zsh
+    bottom
+    nh
+    tealdeer
   ];
 
-  
+  programs = {
+
     #zsh settings and packages
     zsh = {
       enable = true;
@@ -127,6 +139,16 @@
       };
     };
 
+    yazi.enable = true;
+    nh.enable = true;
+    git.enable = true;
+  };
+
+  environment.sessionVariables = {
+    SHELL = "${pkgs.zsh}/bin/zsh";
+    EDITOR = "hx";
+  };
+
   ####configuration des services####
 
   services = {
@@ -144,6 +166,7 @@
 
   };
   
+  nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
